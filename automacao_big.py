@@ -412,15 +412,18 @@ class Application(tk.Frame):
             if self.stop_threads:
                 self.stop_threads = False
                 return
+            
             day = int(self.days_to_feth_label_entry.get())
-            inserir_data(date=today-timedelta(days=day), go_right=False)
+            if today.today().weekday() == 0: ## SEGUNDA
+                inserir_data(date=today-timedelta(days=day), go_right=False)
+                inserir_data(date=today, skip_find=True, go_right=False)
+            else:
+                inserir_data(date=today-timedelta(days=day))
+                inserir_data(date=today-timedelta(days=day), skip_find=True)
+            
             if self.stop_threads:
-                self.stop_threads = False
-                return
-            inserir_data(date=today-timedelta(days=day), skip_find=True, go_right=False)
-            if self.stop_threads:
-                self.stop_threads = False
-                return
+                    self.stop_threads = False
+                    return
             if not self.find_img(img_path=os.getcwd() + SINTETICO, img_name='Relatorio Tipos de Pagamento'): return
             if self.stop_threads:
                 self.stop_threads = False
