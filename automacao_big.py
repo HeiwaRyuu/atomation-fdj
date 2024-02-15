@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 import xlwings as xw
 import pyperclip
 import os
-from playwright.sync_api import *
 import tkinter as tk
 import threading
 from tkinter import messagebox
@@ -71,8 +70,11 @@ def parse_apuracao(apuracao):
     return apuracao
 
 def inserir_data(date, skip_find=False, go_right=True):
+    print(date)
     if skip_find:
         pyautogui.press('tab')
+
+    print(f"{date.strftime('%d')}-{date.strftime('%m')}-{date.strftime('%Y')}")
 
     pyautogui.typewrite(date.strftime('%d'))
     if go_right:
@@ -278,12 +280,13 @@ class Application(tk.Frame):
         count = 0
         lojas, starting_index = self.fetch_lojas()
         count += starting_index
-        if not self.find_img(img_path=os.getcwd() + ICONE_SISTEMA_BIG, img_name='icone_sistema_big', click=False): return
+        if not self.find_img(img_path=os.getcwd() + ICONE_SISTEMA_BIG, img_name='icone_sistema_big', click=False, confidence=STANDARD_CONFIDENCE): return
         pyautogui.move(0, -20)
         pyautogui.click()
         if self.stop_threads:
             self.stop_threads = False
             return
+        time.sleep(1)
         ## RESETANDO A INTERFACE PARA ESCRITORIO
         if not self.find_img(img_path=os.getcwd() + CASINHA, img_name='casinha'): return
         if self.stop_threads:
@@ -332,7 +335,7 @@ class Application(tk.Frame):
             if self.stop_threads:
                 self.stop_threads = False
                 return
-            if not self.find_img(img_path=os.getcwd() + DATA_DA_NOTA, img_name='data da notas'): return
+            if not self.find_img(img_path=os.getcwd() + DATA_DA_NOTA, img_name='data da notas', confidence=HIGH_CONFIDENCE): return
             if self.stop_threads:
                 self.stop_threads = False
                 return
@@ -418,8 +421,8 @@ class Application(tk.Frame):
                 inserir_data(date=today-timedelta(days=day), go_right=False)
                 inserir_data(date=today, skip_find=True, go_right=False)
             else:
-                inserir_data(date=today-timedelta(days=day))
-                inserir_data(date=today-timedelta(days=day), skip_find=True)
+                inserir_data(date=today-timedelta(days=day), go_right=False)
+                inserir_data(date=today-timedelta(days=1), skip_find=True, go_right=False)
             
             if self.stop_threads:
                     self.stop_threads = False
